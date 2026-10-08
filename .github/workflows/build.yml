@@ -18,9 +18,11 @@ jobs:
           java-version: '17'
       - name: Build Android App
         run: |
+          mkdir -p www
+          cp index.html www/
           npm init -y
           npm i @capacitor/core @capacitor/cli @capacitor/android
-          npx cap init "Shop Calc" "com.shop.calc" --web-dir .
+          npx cap init "Shop Calc" "com.shop.calc" --web-dir www
           npx cap add android
           npx cap sync android
           cd android
@@ -31,3 +33,4 @@ jobs:
         with:
           name: Shop-Calculator-APK
           path: android/app/build/outputs/apk/debug/app-debug.apk
+          
