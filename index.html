@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Shop Quick Calc</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --text: #f8fafc;
+      --subtext: #94a3b8;
+      --primary: #2563eb;
+      --accent-green: #10b981;
+      --accent-red: #ef4444;
+      --accent-yellow: #f59e0b;
+      --btn-bg: #334155;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+    }
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding: 10px;
+    }
+    .container {
+      max-width: 480px;
+      margin: 0 auto;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      flex: 1;
+    }
+    .cash-section {
+      background: var(--card);
+      padding: 10px;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--subtext);
+      font-weight: 600;
+    }
+    .cash-chips {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+    }
+    .cash-chip {
+      background: var(--btn-bg);
+      border: 2px solid transparent;
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 700;
+      padding: 8px 0;
+      border-radius: 8px;
+      cursor: pointer;
+      text-align: center;
+    }
+    .cash-chip.active {
+      border-color: var(--accent-green);
+      background: rgba(16, 185, 129, 0.2);
+      color: var(--accent-green);
+    }
+    .display-screen {
+      background: #000000;
+      border-radius: 14px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      border: 1px solid #334155;
+    }
+    .ticker-bar {
+      font-size: 0.85rem;
+      color: #cbd5e1;
+      min-height: 20px;
+      word-break: break-all;
+      font-family: monospace;
+      border-bottom: 1px dashed #334155;
+      padding-bottom: 6px;
+    }
+    .totals-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .total-box {
+      background: rgba(255, 255, 255, 0.04);
+      padding: 8px 10px;
+      border-radius: 8px;
+    }
+    .total-title {
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--subtext);
+      margin-bottom: 2px;
+    }
+    .total-amount {
+      font-size: 1.6rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+    .total-bill { color: #38bdf8; }
+    .total-change { color: var(--accent-green); }
+    .total-change.short { color: var(--accent-red); }
+    .combine-indicator {
+      display: none;
+      background: #854d0e;
+      color: #fef08a;
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .combine-indicator.active { display: flex; }
+    .timer-ring {
+      font-family: monospace;
+      font-weight: 900;
+      background: #ca8a04;
+      padding: 2px 8px;
+      border-radius: 20px;
+      color: #000;
+    }
+    .keys-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      flex: 1;
+    }
+    .key-btn {
+      background: var(--card);
+      border: 1px solid #334155;
+      color: #ffffff;
+      font-size: 1.5rem;
+      font-weight: 700;
+      padding: 16px 0;
+      border-radius: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 3px 0 #0f172a;
+    }
+    .key-btn:active {
+      transform: translateY(2px);
+      box-shadow: 0 1px 0 #0f172a;
+      background: #334155;
+    }
+    .action-row {
+      display: grid;
+      grid-template-columns: 1.3fr 1fr 1.2fr;
+      gap: 8px;
+      margin-top: 4px;
+    }
+    .btn-combine {
+      background: #4338ca;
+      border: 1px solid #6366f1;
+      color: #fff;
+      font-size: 0.95rem;
+      font-weight: 700;
+      border-radius: 10px;
+      padding: 14px 6px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+    }
+    .btn-combine.active {
+      background: var(--accent-yellow);
+      color: #000;
+      border-color: #facc15;
+    }
+    .btn-combine span {
+      font-size: 0.65rem;
+      opacity: 0.8;
+      font-weight: normal;
+    }
+    .btn-undo {
+      background: #475569;
+      border: 1px solid #64748b;
+      color: #f8fafc;
+      font-size: 1rem;
+      font-weight: bold;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+    .btn-clear {
+      background: #7f1d1d;
+      border: 1px solid #dc2626;
+      color: #fecaca;
+      font-size: 0.95rem;
+      font-weight: 800;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+    .btn-clear.confirming {
+      background: #dc2626;
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="cash-section">
+      <div class="label">Customer Cash Given (₹)</div>
+      <div class="cash-chips">
+        <button class="cash-chip" onclick="setCash(100)">₹100</button>
+        <button class="cash-chip" onclick="setCash(200)">₹200</button>
+        <button class="cash-chip" onclick="setCash(500)">₹500</button>
+        <button class="cash-chip" id="customCashBtn" onclick="promptCustomCash()">Custom</button>
+      </div>
+    </div>
+    <div class="display-screen">
+      <div class="ticker-bar" id="tickerTape">Item tape: empty</div>
+      <div class="combine-indicator" id="combineIndicator">
+        <span>Combining Item: ₹<b id="liveCombineVal">0</b></span>
+        <span class="timer-ring" id="timerBadge">2.0s</span>
+      </div>
+      <div class="totals-grid">
+        <div class="total-box">
+          <div class="total-title">ABC: TOTAL BILL</div>
+          <div class="total-amount total-bill" id="totalBill">₹0</div>
+        </div>
+        <div class="total-box">
+          <div class="total-title">XYZ: RETURN CASH</div>
+          <div class="total-amount total-change" id="returnCash">₹0</div>
+        </div>
+      </div>
+    </div>
+    <div class="keys-grid">
+      <button class="key-btn" onclick="handlePriceKey(5)">5</button>
+      <button class="key-btn" onclick="handlePriceKey(10)">10</button>
+      <button class="key-btn" onclick="handlePriceKey(20)">20</button>
+      <button class="key-btn" onclick="handlePriceKey(50)">50</button>
+      <button class="key-btn" onclick="handlePriceKey(100)">100</button>
+      <button class="key-btn" onclick="handlePriceKey(200)">200</button>
+      <button class="key-btn" onclick="handlePriceKey(500)">500</button>
+      <button class="key-btn" style="background:#1e3a5f;" onclick="promptCustomProduct()">+Custom</button>
+      <button class="key-btn" style="background:#1e3a5f;" onclick="handlePriceKey(2)">2</button>
+    </div>
+    <div class="action-row">
+      <button class="btn-combine" id="combineBtn" onclick="toggleCombineMode()">
+        <b>Combine Mode</b>
+        <span>2s Auto-sum</span>
+      </button>
+      <button class="btn-undo" onclick="handleUndo()">⌫ Undo</button>
+      <button class="btn-clear" id="clearBtn" onclick="handleClear()">Clear All</button>
+    </div>
+  </div>
+  <script>
+    let itemsList = []; 
+    let cashGiven = 0;
+    let isCombineMode = false;
+    let combineBuffer = [];
+    let combineTimer = null;
+    let countdownInterval = null;
+    let timeLeftMs = 2000;
+    let clearConfirmTimer = null;
+
+    function vibrate() {
+      if (navigator.vibrate) navigator.vibrate(25);
+    }
+    function setCash(amount) {
+      vibrate();
+      cashGiven = amount;
+      document.querySelectorAll('.cash-chip').forEach(btn => {
+        btn.classList.toggle('active', btn.innerText === `₹${amount}`);
+      });
+      updateDisplay();
+    }
+    function promptCustomCash() {
+      vibrate();
+      const val = prompt("Enter cash given by customer (₹):");
+      if (val && !isNaN(val) && Number(val) > 0) {
+        cashGiven = Number(val);
+        document.querySelectorAll('.cash-chip').forEach(btn => btn.classList.remove('active'));
+        document.getElementById('customCashBtn').classList.add('active');
+        document.getElementById('customCashBtn').innerText = `₹${cashGiven}`;
+        updateDisplay();
+      }
+    }
+    function promptCustomProduct() {
+      vibrate();
+      const val = prompt("Enter product price (₹):");
+      if (val && !isNaN(val) && Number(val) > 0) {
+        handlePriceKey(Number(val));
+      }
+    }
+    function toggleCombineMode() {
+      vibrate();
+      isCombineMode = !isCombineMode;
+      const btn = document.getElementById('combineBtn');
+      const indicator = document.getElementById('combineIndicator');
+      if (isCombineMode) {
+        btn.classList.add('active');
+        btn.querySelector('b').innerText = "Combine ON";
+        indicator.classList.add('active');
+      } else {
+        commitCombineBuffer();
+        btn.classList.remove('active');
+        btn.querySelector('b').innerText = "Combine Mode";
+        indicator.classList.remove('active');
+      }
+    }
+    function handlePriceKey(amount) {
+      vibrate();
+      if (!isCombineMode) {
+        itemsList.push(amount);
+        updateDisplay();
+      } else {
+        combineBuffer.push(amount);
+        resetCombineTimer();
+        updateCombineIndicator();
+      }
+    }
+    function resetCombineTimer() {
+      clearInterval(countdownInterval);
+      clearTimeout(combineTimer);
+      timeLeftMs = 2000;
+      const badge = document.getElementById('timerBadge');
+      badge.innerText = "2.0s";
+      countdownInterval = setInterval(() => {
+        timeLeftMs -= 100;
+        if (timeLeftMs > 0) {
+          badge.innerText = (timeLeftMs / 1000).toFixed(1) + "s";
+        }
+      }, 100);
+      combineTimer = setTimeout(() => {
+        commitCombineBuffer();
+      }, 2000);
+    }
+    function commitCombineBuffer() {
+      clearInterval(countdownInterval);
+      clearTimeout(combineTimer);
+      if (combineBuffer.length > 0) {
+        const sumItem = combineBuffer.reduce((a, b) => a + b, 0);
+        itemsList.push(sumItem);
+        combineBuffer = [];
+      }
+      updateCombineIndicator();
+      updateDisplay();
+    }
+    function updateCombineIndicator() {
+      const sum = combineBuffer.reduce((a, b) => a + b, 0);
+      document.getElementById('liveCombineVal').innerText = sum;
+      if (combineBuffer.length === 0) {
+        document.getElementById('timerBadge').innerText = "2.0s";
+      }
+    }
+    function handleUndo() {
+      vibrate();
+      if (isCombineMode && combineBuffer.length > 0) {
+        combineBuffer.pop();
+        if (combineBuffer.length === 0) {
+          clearInterval(countdownInterval);
+          clearTimeout(combineTimer);
+        } else {
+          resetCombineTimer();
+        }
+        updateCombineIndicator();
+        return;
+      }
+      if (itemsList.length > 0) {
+        itemsList.pop();
+        updateDisplay();
+      }
+    }
+    function handleClear() {
+      vibrate();
+      const clearBtn = document.getElementById('clearBtn');
+      if (clearBtn.classList.contains('confirming')) {
+        clearTimeout(clearConfirmTimer);
+        clearBtn.classList.remove('confirming');
+        clearBtn.innerText = "Clear All";
+        itemsList = [];
+        combineBuffer = [];
+        cashGiven = 0;
+        clearInterval(countdownInterval);
+        clearTimeout(combineTimer);
+        document.querySelectorAll('.cash-chip').forEach(btn => btn.classList.remove('active'));
+        document.getElementById('customCashBtn').innerText = "Custom";
+        updateCombineIndicator();
+        updateDisplay();
+      } else {
+        clearBtn.classList.add('confirming');
+        clearBtn.innerText = "Tap to Confirm";
+        clearConfirmTimer = setTimeout(() => {
+          clearBtn.classList.remove('confirming');
+          clearBtn.innerText = "Clear All";
+        }, 2500);
+      }
+    }
+    function updateDisplay() {
+      const total = itemsList.reduce((a, b) => a + b, 0);
+      document.getElementById('totalBill').innerText = `₹${total}`;
+      const changeBox = document.getElementById('returnCash');
+      if (cashGiven === 0) {
+        changeBox.innerText = `₹0`;
+        changeBox.classList.remove('short');
+      } else {
+        const diff = cashGiven - total;
+        if (diff >= 0) {
+          changeBox.innerText = `₹${diff}`;
+          changeBox.classList.remove('short');
+        } else {
+          changeBox.innerText = `Short -₹${Math.abs(diff)}`;
+          changeBox.classList.add('short');
+        }
+      }
+      const tape = document.getElementById('tickerTape');
+      if (itemsList.length === 0) {
+        tape.innerText = "Item tape: empty";
+      } else {
+        tape.innerText = itemsList.join(" + ") + ` = ₹${total}`;
+      }
+    }
+    updateDisplay();
+  </script>
+</body>
+</html>
